@@ -127,9 +127,12 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         #TODO: Pack Gamestate
         #TODO: Make the RL Model and check to see if it wants to cast instants or activate abilities
         
-        #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 4
-        #Declare Attackers Subphase (2b)
+        #Main Phase (2)
+        #TODO: Implement Main Phase
+        #Skip Begining of Combat Subphase bc it's unnessasary
+        game_state.GamePhase = 6
+    
     else:
         ActivePlayer = StartingPlayer
         game_state.GamePhase = 2
@@ -145,8 +148,11 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         #TODO: Make the RL Model and check to see if it wants to cast instants or activate abilities
         
         #Skip Draw Subphase on first turn
+        game_state.GamePhase = 4
+        #Main Phase (2)
+        #TODO: Implement Main Phase
         #Skip Begining of Combat Subphase bc it's unnessasary
-        game_state.GamePhase = 5
+        game_state.GamePhase = 6
         #Declare Attackers Subphase (2b)
 
 
