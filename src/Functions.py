@@ -18,3 +18,10 @@ def sacrifice(targetplayer, target):
         if CardID == target:
             targetplayer.ExileZone = np.append(targetplayer.ExileZone, CardID)
             targetplayer.Battlefield = np.delete(targetplayer.Battlefield, CardIndex, axis = 1)
+            
+def destroy(targetplayer, target):
+    for CardIndex in range(targetplayer.Battlefield.shape[0]):
+        CardID = targetplayer.Battlefield[0, CardIndex]
+        if CardID == target:
+            targetplayer.Graveyard = np.append(targetplayer.Graveyard, CardID)
+            targetplayer.Battlefield = np.delete(targetplayer.Battlefield, CardIndex, axis = 1)
