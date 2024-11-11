@@ -74,7 +74,7 @@ def GameSetup(game_state):
     np.random.shuffle(game_state.Jeremy.Library)
     draw_cards(game_state.Jeremy, JeremyStartingCards)
     
-    #Draw starting cards (2 instead of one since you already draw yous starting hand)
+    #Draw starting cards (2 instead of one since you already draw your starting hand)
     while AngelStartingCards >= 2:
         #TODO: Make the RL Model give input on wether or not they want to mulligan, instead of just using RNG.
         if random.choice([0, 1]) == 0:
@@ -158,9 +158,6 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 6
         #Declare Attackers Subphase (2b)
-        #TODO: Make the RL Model responsible for ActivePlayer decide which, if any, of its tapped creatures will attack. Then Tap all these attacking creatures
-        for CardID in 
-
 # Create the game state
 game_state = GameState()
 
