@@ -158,6 +158,10 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 6
         #Declare Attackers Subphase (2b)
+        for CardID in ActivePlayer.Battlefield[0]:
+            CardInstance = cb.get_card_by_id(CardID)
+            if "Creature" in CardInstance.types and random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision.
+                #TODO: Mark Attacking Creatures as attacking and let the opponent mark defending creatures as defending but defending hard sadge
 # Create the game state
 game_state = GameState()
 
