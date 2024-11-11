@@ -127,15 +127,13 @@ def GameRuntime(game_state, StartingPlayer):
                 if ability.trigger == 'upkeep': #check for things that trigger at the begining of the upkeep subphase
                     print(f"Activating {ability.trigger} for card ID {CardID}")
                     ability.activate()
-                    
-        #TODO: Pack Gamestate
+             
         #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
         
         game_state.GamePhase = 3
         #Draw Subphase (1c)
         draw_cards(ActivePlayer, 1)
-        
-        #TODO: Pack Gamestate
+
         #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
         
         game_state.GamePhase = 4
@@ -181,6 +179,8 @@ def GameRuntime(game_state, StartingPlayer):
                             else:
                                 print("Error: Ran out of defender slots") 
 
+        #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
+
     else:
         ActivePlayer = StartingPlayer
         if ActivePlayer == game_state.Angel:
@@ -197,7 +197,6 @@ def GameRuntime(game_state, StartingPlayer):
                     print(f"Activating {ability.trigger} for card ID {CardID}")
                     ability.activate()
                     
-        #TODO: Pack Gamestate
         #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
         
         #Skip Draw Subphase on first turn
@@ -244,6 +243,7 @@ def GameRuntime(game_state, StartingPlayer):
                             else:
                                 print("Error: Ran out of defender slots") 
 
+        #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
 
 
 
