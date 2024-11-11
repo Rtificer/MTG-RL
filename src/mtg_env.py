@@ -104,13 +104,14 @@ def GameSetup(game_state):
 
 def GameRuntime(game_state, StartingPlayer, SecondPlayer):
     if game_state.CurrentTurn > 1:
+        ActivePlayer = SecondPlayer
         print("Not the First Turn")
         #Untap Subphase (1a)
         #Starts at zero because 1 = Tapped Status
         SecondPlayer.Battlefield[1] = 0
         game_state.GamePhase = 2
         #Upkeep Subphase (1b)
-        for CardID in range(ActivePlayer.Battlefield.shape[0]):
+        for CardID in ActivePlayer.Battlefield[0]:
             CardInstance = cb.get_card_by_id(CardID)
             for ability in CardInstance.abilities:
                 if ability.trigger == 'upkeep': #check for things that trigger at the begining of the upkeep subphase
@@ -118,26 +119,28 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
                     ability.activate()
                     
         #TODO: Pack Gamestate
-        #TODO: Make the RL Model and check to see if it wants to cast instants or activate abilities
+        #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
         
         game_state.GamePhase = 3
         #Draw Subphase (1c)
         draw_cards(SecondPlayer, 1)
         
         #TODO: Pack Gamestate
-        #TODO: Make the RL Model and check to see if it wants to cast instants or activate abilities
+        #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
         
         game_state.GamePhase = 4
         #Main Phase (2)
-        #TODO: Implement Main Phase
+        #TODO: Make the RL Model responsible for ActivePlayer decide if it wants to play sorceries, instants, creatures, artifacts, enchantments,  and planeswalkers, and activate abilities. They can play 1 land during this phase
+        #TODO: Make the RL Model responsible for the other Player decide if it wants to cast instants or activate the abilities
         #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 6
+        #Declare Attackers Subphase (2b)
     
     else:
         ActivePlayer = StartingPlayer
         game_state.GamePhase = 2
         #Upkeep Subphase (1b)
-        for CardID in range(ActivePlayer.Battlefield.shape[0]):
+        for CardID in ActivePlayer.Battlefield[0]:
             CardInstance = cb.get_card_by_id(CardID)
             for ability in CardInstance.abilities:
                 if ability.trigger == 'upkeep': #check for things that trigger at the begining of the upkeep subphase
@@ -145,16 +148,18 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
                     ability.activate()
                     
         #TODO: Pack Gamestate
-        #TODO: Make the RL Model and check to see if it wants to cast instants or activate abilities
+        #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
         
         #Skip Draw Subphase on first turn
         game_state.GamePhase = 4
         #Main Phase (2)
-        #TODO: Implement Main Phase
+        #TODO: Make the RL Model responsible for ActivePlayer decide if it wants to play sorceries, instants, creatures, artifacts, enchantments,  and planeswalkers, and activate abilities. They can play 1 land during this phase
+        #TODO: Make the RL Model responsible for the other Player decide if it wants to cast instants or activate the abilities
         #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 6
         #Declare Attackers Subphase (2b)
-
+        #TODO: Make the RL Model responsible for ActivePlayer decide which, if any, of its tapped creatures will attack. Then Tap all these attacking creatures
+        for CardID in 
 
 # Create the game state
 game_state = GameState()
