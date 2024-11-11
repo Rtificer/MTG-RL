@@ -4,4 +4,4 @@ import numpy as np
 
 class Wastes(Card):
     def __init__(self):
-        super().__init__(card_id = 1, types = ["Land", "BasicLand"], cost=np.array([0]*6), colors=[7], abilities=[WastesTap])
+        super().__init__(card_id = 1, cost=np.array([0]*6), types = ["Land", "BasicLand"], colors=[7], abilities=[WastesTap])
