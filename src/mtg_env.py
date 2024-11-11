@@ -30,13 +30,15 @@ class Player:
         #Card ID
         #Tapped
         #Summoning Sickness
+        #Attacking
+        #Defending
         #Counters
         #Attachment 1
         #Attachment 2
         #Attachment 3
         #Attachment 4
         #Attachment 5
-        self.Battlefield = np.zeros((9, 0), dtype=np.uint8)
+        self.Battlefield = np.zeros((11, 0), dtype=np.uint8)
             
 
 def GameSetup(game_state):
@@ -158,10 +160,22 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 6
         #Declare Attackers Subphase (2b)
-        for CardID in ActivePlayer.Battlefield[0]:
+        for CardIndex in range(ActivePlayer.Battlefield.shape[0]):
+            
+            CardID = ActivePlayer.Battlefield[0, CardIndex]
             CardInstance = cb.get_card_by_id(CardID)
-            if "Creature" in CardInstance.types and random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision.
-                #TODO: Mark Attacking Creatures as attacking and let the opponent mark defending creatures as defending but defending hard sadge
+            #If the card is a creature that isn't tapped and does not have summoning sickness
+            if "Creature" in CardInstance.types and ActivePlayer.Battlefield[1, CardIndex] == 0 and ActivePlayer.Battlefield[2, CardIndex] == 0:
+                if random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision. Delete when implemented
+                    ActivePlayer.Battlefield[3, CardIndex] = 1
+                    
+            #TODO: Let the opponent mark defending creatures as defending
+
+
+
+
+
+
 # Create the game state
 game_state = GameState()
 
