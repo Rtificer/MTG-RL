@@ -25,8 +25,8 @@ AngelHandSizeTensor = torch.tensor(AngelHandSize, dtype=torch.uint8)
 #Attachment 3
 #Attachment 4
 #Attachment 5
-JeremyBattlefield = torch.zeros((JeremyBattlefieldSize, 11), dtype = torch.uint8)
-AngelBattlefield = torch.zeros((AngelBattlefieldSize, 11), dtype = torch.uint8)
+JeremyBattlefield = torch.zeros((JeremyBattlefieldSize, 18), dtype = torch.uint8)
+AngelBattlefield = torch.zeros((AngelBattlefieldSize, 18), dtype = torch.uint8)
 JeremyGraveyard = torch.tensor([0] * JeremyGraveyardSize, dtype = torch.uint8)
 AngelGraveyard = torch.tensor([0] * AngelGraveyardSize, dtype = torch.uint8)
 JeremyExileZone = torch.tensor([0] * JeremyExileZoneSize, dtype = torch.uint8)

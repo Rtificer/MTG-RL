@@ -30,15 +30,22 @@ class Player:
         #Card ID
         #Tapped
         #Summoning Sickness
-        #Attacking
-        #Defending
         #Counters
+        #Attacking?
+        #Defender 1
+        #Defender 2
+        #Defender 3
+        #Defender 4
+        #Defender 5
+        #Defender 6
+        #Defender 7
+        #Defender 8
         #Attachment 1
         #Attachment 2
         #Attachment 3
         #Attachment 4
         #Attachment 5
-        self.Battlefield = np.zeros((11, 0), dtype=np.uint8)
+        self.Battlefield = np.zeros((18, 0), dtype=np.uint8)
             
 
 def GameSetup(game_state):
@@ -52,22 +59,18 @@ def GameSetup(game_state):
         if random.choice([0, 1]) == 0:
             print("Jeremy goes first")
             StartingPlayer = game_state.Jeremy
-            SecondPlayer = game_state.Angel
         else:
             print("Angel goes first")
             StartingPlayer = game_state.Angel
-            SecondPlayer = game_state.Jeremy
     else:
         print("Angel chooses who starts.")
         #TODO:Replace this random.choice for RL Model Ouput on going first or second
         if random.choice([0, 1]) == 0:
             print("Angel goes first")
             StartingPlayer = game_state.Angel
-            SecondPlayer = game_state.Jeremy
         else:
             print("Jeremy goes first")
             StartingPlayer = game_state.Jeremy
-            SecondPlayer = game_state.Angel
     
     game_state.Angel.Library = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], dtype = np.uint8)
     np.random.shuffle(game_state.Angel.Library)
@@ -102,15 +105,20 @@ def GameSetup(game_state):
             
     game_state.CurrentTurn += 1
     
-    GameRuntime(game_state, StartingPlayer, SecondPlayer)
+    GameRuntime(game_state, StartingPlayer)
 
-def GameRuntime(game_state, StartingPlayer, SecondPlayer):
+def GameRuntime(game_state, StartingPlayer):
     if game_state.CurrentTurn > 1:
-        ActivePlayer = SecondPlayer
+        if ActivePlayer == game_state.Angel:
+            ActivePlayer = game_state.Jeremy
+            InactivePlayer = game_state.Angel
+        else:
+            ActivePlayer = game_state.Angel
+            InactivePlayer = game_state.Jeremy
         print("Not the First Turn")
         #Untap Subphase (1a)
         #Starts at zero because 1 = Tapped Status
-        SecondPlayer.Battlefield[1] = 0
+        ActivePlayer.Battlefield[1] = 0
         game_state.GamePhase = 2
         #Upkeep Subphase (1b)
         for CardID in ActivePlayer.Battlefield[0]:
@@ -125,7 +133,7 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         
         game_state.GamePhase = 3
         #Draw Subphase (1c)
-        draw_cards(SecondPlayer, 1)
+        draw_cards(ActivePlayer, 1)
         
         #TODO: Pack Gamestate
         #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
@@ -137,9 +145,49 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
         #Skip Begining of Combat Subphase bc it's unnessasary
         game_state.GamePhase = 6
         #Declare Attackers Subphase (2b)
+        for CardIndex in range(ActivePlayer.Battlefield.shape[0]):
     
+            CardID = ActivePlayer.Battlefield[0, CardIndex]
+            CardInstance = cb.get_card_by_id(CardID)
+            #If the card is a creature that isn't tapped and does not have summoning sickness
+            if "Creature" in CardInstance.types and ActivePlayer.Battlefield[1, CardIndex] == 0 and ActivePlayer.Battlefield[2, CardIndex] == 0:
+                if random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision. Delete when implemented
+                    ActivePlayer.Battlefield[4, CardIndex] = 1 #Mark That Card As Attacking
+            
+        game_state.GamePhase = 7
+        #Declare Defenders Subphase (2c)
+        #For every Card In the Defending players library
+        for CardIndex in range(InactivePlayer.Battlefield.shape[0]):
+            CardID = InactivePlayer.Battlefield[0, CardIndex]
+            CardInstance = cb.get_card_by_id(CardID)
+            #If the card is an untapped creature
+            if "Creature" in CardInstance.types and ActivePlayer.Battlefield[1, CardIndex] == 0:
+                #Go through every card in the opponents library
+                for CardIndex in range(ActivePlayer.Battlefield.shape[0]):
+                    #If that card is attacking
+                    if ActivePlayer.Battlefield[4, CardIndex] == 1:
+                        #And the Rl model wants to defend it
+                        if random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision. Delete when implemented
+                            DefenderSlot = 5 #Would be 8 becuase of the 8 slots, but is 13 bc the defender slots start 6 units down, and 0 is the first index
+                            #Iterate through every defender slot on the attacking card
+                            while DefenderSlot <= 13:
+                                #Check if it's available
+                                if ActivePlayer.Battlefield[DefenderSlot, CardIndex] == 0:
+                                    #If it is mark this card as defending it (in the first available slot)
+                                    ActivePlayer.Battlefield[DefenderSlot, CardIndex] = CardID
+                                else:
+                                #If its not available try again on the next one
+                                    DefenderSlot += 1
+                            else:
+                                print("Error: Ran out of defender slots") 
+
     else:
         ActivePlayer = StartingPlayer
+        if ActivePlayer == game_state.Angel:
+            InactivePlayer = game_state.Angel
+        else:
+            InactivePlayer = game_state.Jeremy
+            
         game_state.GamePhase = 2
         #Upkeep Subphase (1b)
         for CardID in ActivePlayer.Battlefield[0]:
@@ -167,10 +215,34 @@ def GameRuntime(game_state, StartingPlayer, SecondPlayer):
             #If the card is a creature that isn't tapped and does not have summoning sickness
             if "Creature" in CardInstance.types and ActivePlayer.Battlefield[1, CardIndex] == 0 and ActivePlayer.Battlefield[2, CardIndex] == 0:
                 if random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision. Delete when implemented
-                    ActivePlayer.Battlefield[3, CardIndex] = 1
+                    ActivePlayer.Battlefield[4, CardIndex] = 1 #Mark That Card As Attacking
                     
-            #TODO: Let the opponent mark defending creatures as defending
-
+        game_state.GamePhase = 7
+        #Declare Defenders Subphase (2c)
+        #For every Card In the Defending players library
+        for CardIndex in range(InactivePlayer.Battlefield.shape[0]):
+            CardID = InactivePlayer.Battlefield[0, CardIndex]
+            CardInstance = cb.get_card_by_id(CardID)
+            #If the card is an untapped creature
+            if "Creature" in CardInstance.types and ActivePlayer.Battlefield[1, CardIndex] == 0:
+                #Go through every card in the opponents library
+                for CardIndex in range(ActivePlayer.Battlefield.shape[0]):
+                    #If that card is attacking
+                    if ActivePlayer.Battlefield[4, CardIndex] == 1:
+                        #And the Rl model wants to defend it
+                        if random.choice([0, 1]) == 0: #Randomness is placeholder for RL decision. Delete when implemented
+                            DefenderSlot = 5 #Would be 8 becuase of the 8 slots, but is 13 bc the defender slots start 6 units down, and 0 is the first index
+                            #Iterate through every defender slot on the attacking card
+                            while DefenderSlot <= 13:
+                                #Check if it's available
+                                if ActivePlayer.Battlefield[DefenderSlot, CardIndex] == 0:
+                                    #If it is mark this card as defending it (in the first available slot)
+                                    ActivePlayer.Battlefield[DefenderSlot, CardIndex] = CardID
+                                else:
+                                #If its not available try again on the next one
+                                    DefenderSlot += 1
+                            else:
+                                print("Error: Ran out of defender slots") 
 
 
 
