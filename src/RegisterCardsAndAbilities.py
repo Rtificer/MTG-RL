@@ -29,5 +29,4 @@ def register_all_cards_and_abilities():
                 for ability in card_instance.abilities:
                     register_ability(ability)
             
-# Call this function in your main script to register all cards
 register_all_cards_and_abilities()
