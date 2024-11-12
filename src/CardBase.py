@@ -2,11 +2,13 @@ import numpy as np
 
 class Card:
     #cost:  #1=White, 2=Blue, 3=Black, 4=Red, 5=Green, 6=White, 7=Colorless, 8=AnyColor
-    def __init__(self, card_id, cost = np.array([0]*8, dtype=np.uint8), types=[], colors=[], abilities=[]):
+    def __init__(self, card_id, cost = np.array([0]*8, dtype=np.uint8), types=[], colors=[], power = None, toughness = None, abilities=[]):
         self.card_id = card_id
         self.cost = cost
         self.types = types  #types: Sorcery, Instant, Enchantment, Artifact, Creature, PlanesWalker, Land, BasicLand
         self.colors = colors #1=White, 2=Blue, 3=Black, 4=Red, 5=Green, 6=White, 7=Colorless
+        self.power = power
+        self.toughness = toughness
         self.abilities = abilities  # List of ability functions or triggers
 
   

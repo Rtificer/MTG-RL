@@ -245,7 +245,9 @@ def GameRuntime(game_state, StartingPlayer):
 
         #TODO: Make the RL Models decide if they wants to cast instants or activate abilities
 
-
+        game_state.GamePhase = 8
+        #Combat Damadge Subphase (2d)
+        
 
 
 # Create the game state
