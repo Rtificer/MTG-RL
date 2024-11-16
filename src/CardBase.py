@@ -2,7 +2,7 @@ class Card:
     #W=White, U=Blue, B=Black, R=Red, G=Green, C=Colorless
     def __init__(self, card_id, cost = {}, types={}, colors={}, power = None, toughness = None, abilities={}):
         self.card_id = card_id
-        self.cost = cost #Scryfall Notation
+        self.cost = cost #See above. Use W2 for two white mana. Use U1 for one white mana. Use R/G3
         self.types = types  #types: Sorcery, Instant, Enchantment, Artifact, Creature, PlanesWalker, Land, BasicLand
         self.colors = colors #Standard Magic Notation W=White, U=Blue, B=Black, R=Red, G=Green, C=Colorless
         self.power = power
