@@ -1,8 +1,6 @@
-import numpy as np
-
 class Card:
-    #cost:  #1=White, 2=Blue, 3=Black, 4=Red, 5=Green, 6=White, 7=Colorless, 8=AnyColor
-    def __init__(self, card_id, cost = np.array([0]*8, dtype=np.uint8), types=[], colors=[], power = None, toughness = None, abilities=[]):
+    #cost:  #1=White, 2=Blue, 3=Black, 4=Red, 5=Green, 6=White, 7=Colorless, 8=AnyColor Use o for or, ie. 1o2 means white or blue.
+    def __init__(self, card_id, cost = {}, types={}, colors={}, power = None, toughness = None, abilities={}):
         self.card_id = card_id
         self.cost = cost
         self.types = types  #types: Sorcery, Instant, Enchantment, Artifact, Creature, PlanesWalker, Land, BasicLand
