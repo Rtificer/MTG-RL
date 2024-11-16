@@ -4,6 +4,7 @@ import os
 import importlib
 from CardBase import Card, register_card
 from AbilityBase import register_ability
+from DeckBase import Deck
 
 def draw_cards(player, num_cards):
     if player.Library.size < num_cards:
@@ -18,7 +19,7 @@ def draw_cards(player, num_cards):
         print("Updated library: " + str(player.Library))
 
 def register_decks():
-    # Add Decks and Abilities directories to sys.path
+    # Add Decks path to sys.path
     decks_path = os.path.join(os.getcwd(), "Assets", "Decks")
     sys.path.append(decks_path)
 
@@ -26,31 +27,50 @@ def register_decks():
     for deck in Decks:
         print(f"Deck: {deck}")
 
-        cards_dir = os.path.join(decks_path, deck, "Cards")
+        # Import DeckAttributes.py
+        deck_attributes_path = os.path.join(decks_path, deck, "DeckAttributes.py")
+        if os.path.isfile(deck_attributes_path):
+            module_name = f"{deck}.DeckAttributes"
+            try:
+                module = importlib.import_module(module_name)
+                # Find the Deck class and instantiate it
+                for attr_name in dir(module):
+                    attr = getattr(module, attr_name)
+                    if isinstance(attr, type) and issubclass(attr, Deck) and attr != Deck:
+                        deck_instance = attr()
+                        print(f"Loaded deck attributes: {deck_instance}")
+                        break
+            except ModuleNotFoundError as e:
+                print(f"Module {module_name} not found: {e}")
+                continue
 
+        # Process card files
+        cards_dir = os.path.join(decks_path, deck, "Cards")
         for filename in os.listdir(cards_dir):
             if filename != '__init__.py' and not filename.startswith('__pycache__'):
                 print(f"Processing card file: {filename}")
-                # Adjust module name for Cards directory
                 module_name = f"{deck}.Cards.{filename[:-3]}"
 
-                module = importlib.import_module(module_name)
+                try:
+                    module = importlib.import_module(module_name)
+                except ModuleNotFoundError as e:
+                    print(f"Module {module_name} not found: {e}")
+                    continue
 
-                #Iterate through the module and look for classes to instantiate
+                # Iterate through the module and instantiate card classes
                 for attr_name in dir(module):
                     attr = getattr(module, attr_name)
-                    # Check if it is a class and if it's the correct class
-                    if isinstance(attr, type) and issubclass(attr, Card) and attr != Card:  # Ensures that attr is a class a subclass of Card, and not the Card class itself
+                    if isinstance(attr, type) and issubclass(attr, Card) and attr != Card:
                         card_instance = attr()
                         register_card(card_instance)
 
                         # Register abilities if the card has them
                         if hasattr(card_instance, 'abilities'):
                             for ability in card_instance.abilities:
-                                ability_instance = ability()
+                                ability_instance = ability() if isinstance(ability, type) else ability
                                 print(f"Instantiating ability: {ability_instance}")
                                 register_ability(ability_instance)
-                
+
                 print(f"Done processing card file: {filename}")
 
 def sacrifice(targetplayer, target):
