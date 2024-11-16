@@ -1,1 +1,2 @@
+#Stops pycache from being uploaded to the repo
 __pycache__/
