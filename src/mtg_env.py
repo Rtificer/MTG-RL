@@ -3,8 +3,8 @@ import numpy as np
 import CardBase as cb
 import AbilityBase as ab
 from Functions import draw_cards
-from Functions import register_all_cards_and_abilities
-register_all_cards_and_abilities()
+from Functions import register_decks
+register_decks()
 
 
 
