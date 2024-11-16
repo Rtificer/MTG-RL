@@ -1,10 +1,10 @@
 class Card:
-    #cost:  #1=White, 2=Blue, 3=Black, 4=Red, 5=Green, 6=White, 7=Colorless, 8=AnyColor Use o for or, ie. 1o2 means white or blue.
+    #W=White, U=Blue, B=Black, R=Red, G=Green, C=Colorless
     def __init__(self, card_id, cost = {}, types={}, colors={}, power = None, toughness = None, abilities={}):
         self.card_id = card_id
-        self.cost = cost
+        self.cost = cost #Scryfall Notation
         self.types = types  #types: Sorcery, Instant, Enchantment, Artifact, Creature, PlanesWalker, Land, BasicLand
-        self.colors = colors #1=White, 2=Blue, 3=Black, 4=Red, 5=Green, 6=White, 7=Colorless
+        self.colors = colors #Standard Magic Notation W=White, U=Blue, B=Black, R=Red, G=Green, C=Colorless
         self.power = power
         self.toughness = toughness
         self.abilities = abilities  # List of ability functions or triggers
