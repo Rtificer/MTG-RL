@@ -19,30 +19,40 @@ def draw_cards(player, num_cards):
         print("Updated library: " + str(player.Library))
 
 def register_decks():
+    # Add Decks directory to sys.path
+    decks_path = os.path.join(os.getcwd(), "Assets", "Decks")
+    sys.path.append(decks_path)
+
+    deck_library_lists = {}
+
+    Decks = os.listdir(decks_path)
+    for deck in Decks:
+        print(f"Processing deck: {deck}")
+        
+        deck_module_name = f"{deck}.DeckAttributes"
+        
+        try:
+            # Import the deck module and extract the library list
+            deck_module = importlib.import_module(deck_module_name)
+            deck_instance = deck_module.Deck()  # Create an instance of the Deck class
+            librarylist = deck_instance.librarylist
+            deck_library_lists[deck] = librarylist
+            print(f"Library list for {deck}: {librarylist}")
+        
+        except ModuleNotFoundError as e:
+            print(f"Module {deck_module_name} not found: {e}")
+            continue
+    
+    return deck_library_lists
+
+def register_cards():
+
     # Add Decks path to sys.path
     decks_path = os.path.join(os.getcwd(), "Assets", "Decks")
     sys.path.append(decks_path)
 
     Decks = os.listdir(decks_path)
     for deck in Decks:
-        print(f"Deck: {deck}")
-
-        # Import DeckAttributes.py
-        deck_attributes_path = os.path.join(decks_path, deck, "DeckAttributes.py")
-        if os.path.isfile(deck_attributes_path):
-            module_name = f"{deck}.DeckAttributes"
-            try:
-                module = importlib.import_module(module_name)
-                # Find the Deck class and instantiate it
-                for attr_name in dir(module):
-                    attr = getattr(module, attr_name)
-                    if isinstance(attr, type) and issubclass(attr, Deck) and attr != Deck:
-                        deck_instance = attr()
-                        print(f"Loaded deck attributes: {deck_instance}")
-                        break
-            except ModuleNotFoundError as e:
-                print(f"Module {module_name} not found: {e}")
-                continue
 
         # Process card files
         cards_dir = os.path.join(decks_path, deck, "Cards")

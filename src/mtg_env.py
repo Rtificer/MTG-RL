@@ -4,6 +4,8 @@ import CardBase as cb
 import AbilityBase as ab
 from Functions import draw_cards
 from Functions import register_decks
+from Functions import register_cards
+register_cards()
 register_decks()
 
 
@@ -14,13 +16,13 @@ class GameState:
         self.CurrentTurn = np.uint8(0)
         #0 for setup and 1-12 for each phase and subphase
         self.GamePhase = np.uint8(20)
-        self.Angel = Player("Angel")
-        self.Jeremy = Player("Jeremy")
+        self.Players = []
         
 class Player:
     def __init__(self, name):
         
         self.Name = name
+        self.Deck = None
         self.Life = np.uint8(20)
         self.ManaPool = np.array([0] * 7, dtype = np.uint8) #White, Blue, Black, Red, Green, White, Colorless
         self.Hand = np.array([0] * 0, dtype = np.uint8)
@@ -48,46 +50,49 @@ class Player:
         #Attachment 4
         #Attachment 5
         self.Battlefield = np.zeros((19, 0), dtype=np.uint8)
-
-class CardSlot:
-    def __init__(self, CardID = np.uint8, tapped = np.bool_, SummoningSickness = np.bool_, Counters = np.uint8, CurrentToughness = np.uint8, CurrentPower = np.uint8, Attacking = np.bool_, Defenders = np.array([0] * 0, dtype=np.uint8), Attachments = np.array([0] * 0, dtype=np.uint8)):
-        self.card_id = CardID
-        self.tapped = tapped
-        self.SummoningSickness = SummoningSickness
-        self.Counters = Counters
-        self.CurrentToughness = CurrentToughness
-        self.CurrentPower = CurrentPower
-        self.Attacking = Attacking
-        self.Defenders = Defenders
-        self.Attachments = Attachments
         
 
-class Battlefield:
-    
-
 def GameSetup(game_state):
+    #Get the starting libraries associated with each deck
+    StartingLibraries = register_decks()
+    while True:
+        #Get the Number of Players
+        numplayers = input("Input Number of Players")
+        if isinstance(numplayers, int) and numplayers > 0:
+            i = 0
+            while i < numplayers:
+                
+                PlayerName = input(f"Input Player{i} Name")
+                game_state.Players.append(Player(PlayerName))
+                #Get the Deck for each player
+                while True (PlayerName):
+                    PlayerDeck = input(f"Input Deck For {PlayerName}")
+                    if PlayerDeck in StartingLibraries:
+                        #Add that deck as the player's deck.
+                        game_state.Players[i].Deck = PlayerDeck
+                        #Add That Deck to the Players Library
+                        game_state.Players[i].Library = StartingLibraries[PlayerDeck]
+                    else:
+                        print(f"Deck {PlayerDeck} not found")
+                i += 1
+            else:
+                break
+        else:
+            print(f"{numplayers} is not a valid playercount")
+        #Shuffle Player Libraries
+        for Player in game_state.Players:
+            np.random.shuffle(Player.Library)
+            
+    
     AngelStartingCards = 7
     JeremyStartingCards = 7
     
     # Determine who goes first
-    if random.choice([0, 1]) == 0:
-        print("Jeremy chooses who starts.")
-        #TODO:Replace this random.choice for RL Model Ouput on going first or second
-        if random.choice([0, 1]) == 0:
-            print("Jeremy goes first")
-            StartingPlayer = game_state.Jeremy
-        else:
-            print("Angel goes first")
-            StartingPlayer = game_state.Angel
-    else:
-        print("Angel chooses who starts.")
-        #TODO:Replace this random.choice for RL Model Ouput on going first or second
-        if random.choice([0, 1]) == 0:
-            print("Angel goes first")
-            StartingPlayer = game_state.Angel
-        else:
-            print("Jeremy goes first")
-            StartingPlayer = game_state.Jeremy
+    StartChooser = random.choice(game_state.Players)
+    #TODO: Make the RL Model give input on who the startchooser decides goes first instead of just doing another random.choice
+    StartingPlayer = random.choice(game_state.Players)
+    
+
     
     game_state.Angel.Library = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], dtype = np.uint8)
     np.random.shuffle(game_state.Angel.Library)
