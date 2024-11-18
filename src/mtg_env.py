@@ -17,6 +17,7 @@ class GameState:
         #0 for setup and 1-12 for each phase and subphase
         self.GamePhase = np.uint8(20)
         self.Players = []
+        self.TurnOrder = []
         
 class Player:
     def __init__(self, name):
@@ -83,47 +84,41 @@ def GameSetup(game_state):
         for Player in game_state.Players:
             np.random.shuffle(Player.Library)
             
-    
-    AngelStartingCards = 7
-    JeremyStartingCards = 7
+
     
     # Determine who goes first
     StartChooser = random.choice(game_state.Players)
     #TODO: Make the RL Model give input on who the startchooser decides goes first instead of just doing another random.choice
     StartingPlayer = random.choice(game_state.Players)
     
-
+    #Establish Turn Order
+    game_state.TurnOrder = random.shuffle(game_state.Players)
     
-    game_state.Angel.Library = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], dtype = np.uint8)
-    np.random.shuffle(game_state.Angel.Library)
-    draw_cards(game_state.Angel, AngelStartingCards)
-    game_state.Jeremy.Library = np.array([31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60], dtype = np.uint8)
-    np.random.shuffle(game_state.Jeremy.Library)
-    draw_cards(game_state.Jeremy, JeremyStartingCards)
+    for Player in game_state.TurnOrder:
+        if Player == StartingPlayer:
+            game_state.TurnOrder.remove(StartingPlayer)
+            game_state.TurnOrder.insert(0, StartingPlayer)
+            break
+    else:
+        print(f"Error: Starting Player Not Found in Player List")
     
-    #Draw starting cards (2 instead of one since you already draw your starting hand)
-    while AngelStartingCards >= 2:
-        #TODO: Make the RL Model give input on wether or not they want to mulligan, instead of just using RNG.
-        if random.choice([0, 1]) == 0:
-            break
-        else:
-            #Reset + Shuffle Angel Library
-            game_state.Angel.Hand = np.array([0] * 0, dtype = np.uint8)
-            game_state.Angel.Library = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30], dtype = np.uint8)
-            np.random.shuffle(game_state.Angel.Library)
-            draw_cards(game_state.Angel, AngelStartingCards)
-            AngelStartingCards += -1
-    while JeremyStartingCards >= 2:
-        #TODO: Make the RL Model give input on wether or not they want to mulligan, instead of just using RNG.
-        if random.choice([0, 1]) == 0:
-            break
-        else:
-            #Reset + Shuffle Jeremy Library
-            game_state.Jeremy.Hand = np.array([0] * 0, dtype = np.uint8)
-            game_state.Jeremy.Library = np.array([31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60], dtype = np.uint8)
-            np.random.shuffle(game_state.Jeremy.Library)
-            draw_cards(game_state.Jeremy, JeremyStartingCards)
-            JeremyStartingCards += -1
+    #Draw Starting Cards
+    for Player in game_state.Players:
+        draw_cards(Player, 7)
+    
+    
+    #Handle Mulligans
+    MulliganingPlayers = []
+    RemainingCardDrawCount = 6
+    while len(MulliganingPlayers) > 0:
+        for Player in game_state.TurnOrder not in MulliganingPlayers:
+            #TODO: Make the RL Model give input on wether or not they want to mulligan, instead of just using RNG.
+            if random.choice([0, 1]) == 0:
+                Player.Library = StartingLibraries[Player.Deck]
+                Player.Hand.fill(0)
+                draw_cards(Player, RemainingCardDrawCount)
+        
+        RemainingCardDrawCount -= 1
             
     game_state.CurrentTurn += 1
     
