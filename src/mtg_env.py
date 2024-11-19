@@ -5,8 +5,15 @@ import AbilityBase as ab
 from Functions import draw_cards
 from Functions import register_decks
 from Functions import register_cards
+from Functions import DefineSettings
+
 register_cards()
-register_decks()
+gameSettings = DefineSettings()
+
+
+
+
+
 
 
 
@@ -20,40 +27,28 @@ class GameState:
         self.TurnOrder = []
         
 class Player:
-    def __init__(self, name):
+    
+    
+    def __init__(self, name, gameSettings):
         
         self.Name = name
         self.Deck = None
         self.Life = np.uint8(20)
         self.ManaPool = np.array([0] * 7, dtype = np.uint8) #White, Blue, Black, Red, Green, White, Colorless
-        self.Hand = np.array([0] * 0, dtype = np.uint8)
-        self.Library = np.array([0] * 30, dtype = np.uint8)
-        self.Graveyard = np.array([0] * 0, dtype = np.uint8)
-        self.ExileZone = np.array([0] * 0, dtype = np.uint8)
+        self.Hand = np.array([0] * gameSettings["MaxHandSize"], dtype = np.uint8)
+        self.Library = np.array([0] * gameSettings["MaxLibrarySize"], dtype = np.uint8)
+        self.Graveyard = np.array([0] * gameSettings["MaxGraveyardSize"], dtype = np.uint8)
+        self.ExileZone = np.array([0] * gameSettings["MaxExileZoneSize"], dtype = np.uint8)
         #Card ID
         #Tapped
         #Summoning Sickness
         #Counters
         #Remaining Toughness
-        #Current Attack
-        #Attacking?
-        #Defender 1
-        #Defender 2
-        #Defender 3
-        #Defender 4
-        #Defender 5
-        #Defender 6
-        #Defender 7
-        #Defender 8
-        #Attachment 1
-        #Attachment 2
-        #Attachment 3
-        #Attachment 4
-        #Attachment 5
-        self.Battlefield = np.zeros((19, 0), dtype=np.uint8)
+        #Current Attack6 + 
+        self.Battlefield = np.zeros((6 + gameSettings["MaxAttachments"], gameSettings["MaxBattlefieldSize"]), dtype=np.uint8)
         
+def SetupGameState():
 
-def GameSetup(game_state):
     #Get the starting libraries associated with each deck
     StartingLibraries = register_decks()
     while True:
@@ -64,7 +59,7 @@ def GameSetup(game_state):
             while i < numplayers:
                 
                 PlayerName = input(f"Input Player{i} Name")
-                game_state.Players.append(Player(PlayerName))
+                game_state.Players.append(Player(PlayerName, gameSettings))
                 #Get the Deck for each player
                 while True (PlayerName):
                     PlayerDeck = input(f"Input Deck For {PlayerName}")
@@ -73,16 +68,23 @@ def GameSetup(game_state):
                         game_state.Players[i].Deck = PlayerDeck
                         #Add That Deck to the Players Library
                         game_state.Players[i].Library = StartingLibraries[PlayerDeck]
+                        break
                     else:
                         print(f"Deck {PlayerDeck} not found")
+                        
+
                 i += 1
             else:
                 break
         else:
-            print(f"{numplayers} is not a valid playercount")
-        #Shuffle Player Libraries
-        for Player in game_state.Players:
-            np.random.shuffle(Player.Library)
+            print(f"{numplayers} is not a valid player count")
+
+def GameSetup(game_state):
+
+    #Shuffle Player Libraries
+    for player in game_state.Players:
+        np.random.shuffle(player.Library)
+
             
 
     
