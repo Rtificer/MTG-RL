@@ -131,6 +131,20 @@ def DefineSettings():
     
     return gameSettings    
 
+def PutCardOntoBattlefield(player, card):
+    try:
+        #player.Battlefield[0, :] == 0 is a boolean array of the first row (card IDs) of the battlefield. True when a card slot does not contain a card
+        #argmax my beloved will scan through this array and output the index of the first occurence of true, in this case
+        Index = np.argmax(player.Battlefield[0, :] == 0)
+    except:
+        raise OverflowError(f"No space in {player}'s Battlefield")
+        
+    # If all card slots are full, np.argmax returns 0, which could be incorrect.
+    if player.Battlefield[0, Index] != 0:
+        raise OverflowError(f"No space in {player}'s Battlefield")
+    
+    player.Battlefield[:, Index] = card
+
 def draw_cards(player, num_cards):
     if player.Library.size < num_cards:
         print(player.Name + " lost the game")
