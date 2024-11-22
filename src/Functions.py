@@ -145,6 +145,31 @@ def PutCardOntoBattlefield(player, card):
     
     player.Battlefield[:, Index] = card
 
+def RemoveCardFromBattlefield(player, TargetCardID, Index):
+    if TargetCardID != None:
+        # Find the column index of the TargetCardID
+        Index = np.argmax(player.Battlefield[0, :] == TargetCardID)
+        
+        # Check if the card exists in the battlefield
+        if player.Battlefield[0, Index] != TargetCardID:
+            raise ValueError(f"Card ID {TargetCardID} not found in battlefield.")
+        
+    elif Index != None:
+        #Check if the index is valid
+        if Index > player.Battlefield.shape[1] or Index < 0:
+            raise ValueError(f"Target index {Index} is not within the battlefield bounds.")
+    else:
+    
+        raise ValueError("No Index or CardID given.")
+
+
+    # Shift all columns left from the target index
+    player.Battlefield[:, Index:-1] = player.Battlefield[:, Index+1:]
+    
+    # Reset the last column to zero
+    player.Battlefield[:, -1] = 0
+        
+
 def draw_cards(player, num_cards):
     if player.Library.size < num_cards:
         print(player.Name + " lost the game")
