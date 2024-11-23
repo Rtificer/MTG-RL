@@ -171,16 +171,29 @@ def RemoveCardFromBattlefield(player, TargetCardID, Index):
         
 
 def draw_cards(player, num_cards):
-    if player.Library.size < num_cards:
+    # Check if the player has enough cards in the library
+    if np.count_nonzero(player.Library) < num_cards:
         print(player.Name + " lost the game")
-    else:
-        # Draw the specified number of cards
-        for _ in range(num_cards):
-            player.Hand = np.append(player.Hand, player.Library[0])
-            player.Libary = np.delete(player.Library, 0)
-        print(f"Player {player.Name} has drawn {num_cards} cards.")
-        print("New hand: " + str(player.Hand))
-        print("Updated library: " + str(player.Library))
+        return  # Exit the function
+    
+    # Draw the specified number of cards
+    for _ in range(num_cards):
+        # Get the top card ID
+        DrawnCardID = player.Library[0]
+        
+        # Shift the library and fill the last position with 0
+        player.Library[:-1] = player.Library[1:]
+        player.Library[-1] = 0
+        
+        # Check if there's space in the hand
+        if not np.any(player.Hand == 0):
+            raise OverflowError(f"No space in {player.Name}'s Hand")
+        
+        # Find the first empty spot in the hand
+        HandIndex = np.argmax(player.Hand == 0)
+        
+        # Place the drawn card into the hand
+        player.Hand[HandIndex] = DrawnCardID
 
 def sacrifice(targetplayer, target):
     for CardIndex in range(targetplayer.Battlefield.shape[0]):
