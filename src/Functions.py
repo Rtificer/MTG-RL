@@ -120,13 +120,22 @@ def DefineSettings():
         else:
             print(f"{MaxAttachments} is not a valid number of maximum attachments.")
             
+    while True:
+        #Get the Number of Players
+        PlayerCount = input("Input Number of Players")
+        if isinstance(PlayerCount, int) and PlayerCount > 0:
+            break
+        else:
+            print(f"{PlayerCount} is not a valid player count")
+            
     gameSettings = {
         "MaxHandSize":MaxHandSize, 
         "MaxLibrarySize":MaxLibrarySize, 
         "MaxGraveyardSize":MaxGraveyardSize, 
         "MaxExileZoneSize":MaxExileZoneSize,
         "MaxBattlefieldSize":MaxBattlefieldSize,
-        "MaxAttachments":MaxAttachments
+        "MaxAttachments":MaxAttachments,
+        "PlayerCount":PlayerCount
         }
     
     return gameSettings    
@@ -207,7 +216,7 @@ def AddCardToExileZone(player, CardID):
     if player.ExileZone[0, Index] != 0:
         raise OverflowError(f"No space in {player}'s ExileZone")
     
-    player.ExileZone[:, Index] = CardID
+    player.ExileZone[Index] = CardID
 
 def AddCardToGraveyard(player, CardID):
     try:
@@ -221,7 +230,7 @@ def AddCardToGraveyard(player, CardID):
     if player.Graveyard[0, Index] != 0:
         raise OverflowError(f"No space in {player}'s Graveyard")
     
-    player.Graveyard[:, Index] = CardID
+    player.Graveyard[Index] = CardID
 
 def sacrifice(player, CardID, Index):
     if CardID != None:
@@ -246,11 +255,7 @@ def sacrifice(player, CardID, Index):
     #Removing Card By Index is Faster
     RemoveCardFromBattlefield(player, None, Index)
     AddCardToExileZone(player, CardID)
-    
-    
-    
-
-            
+                
 def destroy(player, CardID, Index):
     if CardID != None:
         # Find the column index of the TargetCardID

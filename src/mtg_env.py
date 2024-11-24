@@ -11,12 +11,6 @@ register_cards()
 gameSettings = DefineSettings()
 
 
-
-
-
-
-
-
 class GameState:
     def __init__(self):
         # Define Player Specific Gamestate
@@ -24,14 +18,15 @@ class GameState:
         #0 for setup and 1-12 for each phase and subphase
         self.GamePhase = np.uint8(20)
         self.Players = []
-        self.TurnOrder = []
+        self.TurnOrder = np.array([0] * gameSettings["PlayerCount"], dtype = np.uint8)
         
 class Player:
     
     
-    def __init__(self, name, gameSettings):
+    def __init__(self, name, ID, gameSettings):
         
         self.Name = name
+        self.ID = ID
         self.Deck = None
         self.Life = np.uint8(20)
         self.ManaPool = np.array([0] * 7, dtype = np.uint8) #White, Blue, Black, Red, Green, White, Colorless
@@ -44,40 +39,31 @@ class Player:
         #Summoning Sickness
         #Counters
         #Remaining Toughness
-        #Current Attack6 + 
+        #Current Attack
+        #Attachments
         self.Battlefield = np.zeros((6 + gameSettings["MaxAttachments"], gameSettings["MaxBattlefieldSize"]), dtype=np.uint8)
         
 def SetupGameState():
-
     #Get the starting libraries associated with each deck
     StartingLibraries = register_decks()
-    while True:
-        #Get the Number of Players
-        numplayers = input("Input Number of Players")
-        if isinstance(numplayers, int) and numplayers > 0:
-            i = 0
-            while i < numplayers:
-                
-                PlayerName = input(f"Input Player{i} Name")
-                game_state.Players.append(Player(PlayerName, gameSettings))
-                #Get the Deck for each player
-                while True (PlayerName):
-                    PlayerDeck = input(f"Input Deck For {PlayerName}")
-                    if PlayerDeck in StartingLibraries:
-                        #Add that deck as the player's deck.
-                        game_state.Players[i].Deck = PlayerDeck
-                        #Add That Deck to the Players Library
-                        game_state.Players[i].Library = StartingLibraries[PlayerDeck]
-                        break
-                    else:
-                        print(f"Deck {PlayerDeck} not found")
-                        
 
-                i += 1
-            else:
+    i = 0
+    while i < gameSettings["PlayerCount"]:
+        PlayerName = input(f"Input Player{i} Name")
+        game_state.Players.append(Player(PlayerName, i+1, gameSettings))
+        #Get the Deck for each player
+        while True (PlayerName):
+            PlayerDeck = input(f"Input Deck For {PlayerName}")
+            if PlayerDeck in StartingLibraries:
+                #Add that deck as the player's deck.
+                game_state.Players[i].Deck = PlayerDeck
+                #Add That Deck to the Players Library
+                game_state.Players[i].Library = StartingLibraries[PlayerDeck]
                 break
-        else:
-            print(f"{numplayers} is not a valid player count")
+            else:
+                print(f"Deck {PlayerDeck} not found")
+
+        i += 1
 
 def GameSetup(game_state):
 
@@ -94,17 +80,16 @@ def GameSetup(game_state):
     StartingPlayer = random.choice(game_state.Players)
     
     #Establish Turn Order
-    game_state.TurnOrder = random.shuffle(game_state.Players)
+    Index = 0
+    for Player in game_state.Players:
+        if Player != StartingPlayer:
+            Index += 1
+            game_state.TurnOrder[Index] = Player.ID
+            
+    np.random.shuffle(game_state.TurnOrder)
     
-    for Player in game_state.TurnOrder:
-        if Player == StartingPlayer:
-            game_state.TurnOrder.remove(StartingPlayer)
-            game_state.TurnOrder.insert(0, StartingPlayer)
-            break
-    else:
-        print(f"Error: Starting Player Not Found in Player List")
-    
-    #Draw Starting Cards
+    game_state.TurnOrder[0] = StartingPlayer.ID
+
     for Player in game_state.Players:
         draw_cards(Player, 7)
     
