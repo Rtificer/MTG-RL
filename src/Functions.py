@@ -209,6 +209,20 @@ def AddCardToExileZone(player, CardID):
     
     player.ExileZone[:, Index] = CardID
 
+def AddCardToGraveyard(player, CardID):
+    try:
+        #player.Graveyard[0, :] == 0 is a boolean array of the first row (card IDs) of the battlefield. True when a card slot does not contain a card
+        #argmax my beloved will scan through this array and output the index of the first occurence of true, in this case
+        Index = np.argmax(player.Graveyard[0, :] == 0)
+    except:
+        raise OverflowError(f"No space in {player}'s Graveyard")
+        
+    # If all card slots are full, np.argmax returns 0, which could be incorrect.
+    if player.Graveyard[0, Index] != 0:
+        raise OverflowError(f"No space in {player}'s Graveyard")
+    
+    player.Graveyard[:, Index] = CardID
+
 def sacrifice(player, CardID, Index):
     if CardID != None:
         # Find the column index of the TargetCardID
@@ -237,9 +251,24 @@ def sacrifice(player, CardID, Index):
     
 
             
-def destroy(targetplayer, target):
-    for CardIndex in range(targetplayer.Battlefield.shape[0]):
-        CardID = targetplayer.Battlefield[0, CardIndex]
-        if CardID == target:
-            targetplayer.Graveyard = np.append(targetplayer.Graveyard, CardID)
-            targetplayer.Battlefield = np.delete(targetplayer.Battlefield, CardIndex, axis = 1)
+def destroy(player, CardID, Index):
+    if CardID != None:
+        # Find the column index of the TargetCardID
+        Index = np.argmax(player.Battlefield[0, :] == CardID)
+        
+        # Check if the card exists in the battlefield
+        if player.Battlefield[0, Index] != CardID:
+            raise ValueError(f"Card ID {CardID} not found in battlefield.")
+        
+    elif Index != None:
+        #Check if the index is valid
+        if Index > player.Battlefield.shape[1] or Index < 0:
+            raise ValueError(f"Target index {Index} is not within the battlefield bounds.")
+        else:
+            CardID = player.Battlefield[:, Index]
+    else:
+    
+        raise ValueError("No Index or CardID given.")
+    
+    RemoveCardFromBattlefield(player, None, Index)
+    AddCardToGraveyard(player, CardID)
