@@ -4,6 +4,7 @@ import os
 import importlib
 from CardBase import Card, register_card
 from AbilityBase import register_ability
+from utils.utils import obtainpositiveinteger
 from DeckBase import Deck
 
 def register_decks():
@@ -65,6 +66,7 @@ def register_cards():
                         # Register abilities if the card has them
                         if hasattr(card_instance, 'abilities'):
                             for ability in card_instance.abilities:
+                                #Can instantiate them either as classes that require inputs or objects that do not.
                                 ability_instance = ability() if isinstance(ability, type) else ability
                                 print(f"Instantiating ability: {ability_instance}")
                                 register_ability(ability_instance)
@@ -73,60 +75,13 @@ def register_cards():
                 
 def DefineSettings():
     #Get Sizes for library, attachments, max battlefield card count, exile zones, graveyards, etc.
-    while True:
-        
-        MaxHandSize = input("Input maximum hand size:")
-        if isinstance(MaxHandSize, int) and MaxHandSize > 0: 
-            break
-        else:
-            print(f"{MaxHandSize} is not a valid maximum hand size.")    
-    
-    while True:
-        
-        MaxLibrarySize = input("Input maximum library size:")
-        if isinstance(MaxLibrarySize, int) and MaxLibrarySize > 0: 
-            break
-        else:
-            print(f"{MaxLibrarySize} is not a valid maximum library size.")
-            
-    while True:
-        
-        MaxGraveyardSize = input("Input maximum graveyard size:")
-        if isinstance(MaxGraveyardSize, int) and MaxGraveyardSize > 0: 
-            break
-        else:
-            print(f"{MaxGraveyardSize} is not a valid maximum graveyard size.")
-            
-    while True:
-        
-        MaxExileZoneSize = input("Input maximum exile zone size:")
-        if isinstance(MaxExileZoneSize, int) and MaxExileZoneSize > 0: 
-            break
-        else:
-            print(f"{MaxExileZoneSize} is not a valid maximum exile zone size.")
-            
-    while True:
-        
-        MaxBattlefieldSize = input("Input maximum battlefield size:")
-        if isinstance(MaxBattlefieldSize, int) and MaxBattlefieldSize > 0: 
-            break
-        else:
-            print(f"{MaxBattlefieldSize} is not a valid battlefield library size.")
-
-    while True:
-        MaxAttachments = input("Input Maximum attachments:")
-        if isinstance(MaxAttachments, int) and MaxAttachments > 0: 
-            break
-        else:
-            print(f"{MaxAttachments} is not a valid number of maximum attachments.")
-            
-    while True:
-        #Get the Number of Players
-        PlayerCount = input("Input Number of Players")
-        if isinstance(PlayerCount, int) and PlayerCount > 0:
-            break
-        else:
-            print(f"{PlayerCount} is not a valid player count")
+    MaxHandSize = obtainpositiveinteger("Input maximum hand size: ")
+    MaxLibrarySize = obtainpositiveinteger("Input maximum library size: ")
+    MaxGraveyardSize = obtainpositiveinteger("Input maximum graveyard size: ")
+    MaxExileZoneSize = obtainpositiveinteger("Input maximum exile zone size: ")
+    MaxBattlefieldSize = obtainpositiveinteger("Input maximum battlefield size: ")
+    MaxAttachments = obtainpositiveinteger("Input Maximum attachments: ")
+    PlayerCount = obtainpositiveinteger("Input number of players: ")
             
     gameSettings = {
         "MaxHandSize":MaxHandSize, 
