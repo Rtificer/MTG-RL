@@ -59,6 +59,9 @@ class WriteIndexArray:
         
             # Reset the last column to zero
             self.array[self.start-1] = 0
+            
+        #Decrement start counter
+        self.start -= 1
         
         
 class TwoDimenionalWriteIndexArray:
