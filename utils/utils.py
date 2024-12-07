@@ -59,6 +59,14 @@ class WriteIndexArray:
         #Decrement start counter
         self.start -= 1
         
+    def query(self, index):
+        
+        if index < 0 or index >= self.start:
+            
+            raise ValueError(f"Index {index} is not within 1DWriteIndexArray bounds.")
+        
+        return self.array[index]
+        
         
 class TwoDimenionalWriteIndexArray:
     def __init__(self, rows, columns):
@@ -114,7 +122,7 @@ class TwoDimenionalWriteIndexArray:
         
         if index < 0 or index >= self.start:
             
-            raise ValueError(f"Index {index} is not within 2DStartIndexArray bounds.")
+            raise ValueError(f"Index {index} is not within 2DWriteIndexArray bounds.")
         
         return self.array[:, index]
         
