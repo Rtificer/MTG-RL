@@ -9,8 +9,10 @@ from Functions import DefineSettings
 from utils.utils import WriteIndexArray
 from utils.utils import TwoDimenionalWriteIndexArray
 
+
 register_cards()
 gameSettings = DefineSettings()
+deck_data = register_decks()
 
 
 class GameState:
@@ -29,6 +31,9 @@ class Player:
         
         self.Name = name
         self.ID = ID
+        
+        self.Perspective = PlayerPerspective(self.ID, gameSettings, deck_data)
+        
         self.Deck = None
         self.Life = np.uint8(20)
         self.ManaPool = WriteIndexArray(6) #White, Blue, Black, Red, Green, Colorless
@@ -43,7 +48,36 @@ class Player:
         #Remaining Toughness
         #Current Attack
         #Attachments
-        self.Battlefield = np.zeros((6 + gameSettings["MaxAttachments"], gameSettings["MaxBattlefieldSize"]), dtype=np.uint8)
+        self.Battlefield = TwoDimenionalWriteIndexArray(6 + gameSettings["MaxAttachments"], gameSettings["MaxBattlefieldSize"])
+        
+class PlayerPerspective:
+    
+    def __init__(self, playerID, gameSettings, deck_data):
+        #Dictionary Holding Persepctive Data
+        self.Data = {}
+        
+        
+        for player in game_state.Players:
+            if player.ID == playerID:
+                #Persepctive of this player
+                
+                totalcardcount = deck_data[player.Deck]["TotalCardCount"]                
+                
+                self.Data[playerID] = {
+                    "Library" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxLibrarySize"])
+                }
+                
+            else:
+                
+                totalcardcount = deck_data[player.Deck]["TotalCardCount"]
+                
+                self.Data[player.ID] = {
+                    
+                    "Hand" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxHandSize"]),
+                    "Library" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxLibrarySize"]),    
+                    "Graveyard" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxGraveyardSize"]),              
+                    "ExileZone" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxExileZoneSize"])
+                }            
         
 def SetupGameState():
     #Get the starting libraries associated with each deck

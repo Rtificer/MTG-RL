@@ -12,27 +12,39 @@ def register_decks():
     decks_path = os.path.join(os.getcwd(), "Assets", "Decks")
     sys.path.append(decks_path)
 
-    deck_library_lists = {}
+    deck_data = {}
 
-    Decks = os.listdir(decks_path)
-    for deck in Decks:
+    # Get a list of deck directories or files (assuming directories for modularity)
+    decks = [deck for deck in os.listdir(decks_path) if os.path.isdir(os.path.join(decks_path, deck))]
+    
+    for deck in decks:
         print(f"Processing deck: {deck}")
         
         deck_module_name = f"{deck}.DeckAttributes"
         
         try:
-            # Import the deck module and extract the library list
+            # Import the deck module and extract attributes
             deck_module = importlib.import_module(deck_module_name)
             deck_instance = deck_module.Deck()  # Create an instance of the Deck class
-            librarylist = deck_instance.librarylist
-            deck_library_lists[deck] = librarylist
-            print(f"Library list for {deck}: {librarylist}")
+            
+            librarylist = getattr(deck_instance, 'librarylist', None)
+            totalcardcount = getattr(deck_instance, 'totalcardcount', None)
+            
+            # Store data in the dictionary
+            deck_data[deck] = {
+                "librarylist": librarylist,
+                "totalcardcount": totalcardcount,
+            }
+            
+            print(f"Data for {deck}: {deck_data[deck]}")
         
         except ModuleNotFoundError as e:
             print(f"Module {deck_module_name} not found: {e}")
-            continue
+        except Exception as e:
+            print(f"Error processing deck {deck}: {e}")
     
-    return deck_library_lists
+    return deck_data
+
 
 def register_cards():
 
@@ -232,3 +244,20 @@ def destroy(player, CardID, Index):
     
     RemoveCardFromBattlefield(player, None, Index)
     AddCardToGraveyard(player, CardID)
+    
+#Untap Step
+# - Active Player's Phased in Permanents with phasing controlled by active player phase out.
+#   Active Players phased out permanents that the active player controls phases in
+# - Phased Out Permanents phase in
+# - Active Player's Permanents untap unless a card explicity states otherwise    
+    
+#Upkeep
+# - Active Player Chooses Order of "At the Start of Upkeep" Ability Activation
+# - Non-Active Player Chooses Order of "At the Start of Upkeep" Ability Activation
+# - I'
+#
+#
+#
+#
+#
+#

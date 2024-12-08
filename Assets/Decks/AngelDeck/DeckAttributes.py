@@ -5,6 +5,5 @@ class AngelDeck(Deck):
     def __init__(self):
         super().__init__(    
             librarylist = np.array(61, 61, 61, 61),
-            CanPlayerObtainOpponentCards = np.bool_(False),
-            CanOpponentObtainPlayerCards = np.bool_(False)
+            totalcardcount = 4
         )
