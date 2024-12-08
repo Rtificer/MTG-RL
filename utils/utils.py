@@ -191,6 +191,37 @@ class TwoDimensionalStartIndexArray:
         
         #Decrement start counter
         self.start -= 1
+        
+    def modify(self, data, index):
+        if index is None:
+            
+            raise ValueError("No Index given.")
+        
+        #Check if the index is valid            
+        if index >= self.maxindex or index < 0:
+            
+            raise ValueError(f"Target index {index} is not within the 2DStartIndexArray bounds.")
+        
+        if index > self.start:
+            
+            raise ValueError(f"Target index {index} is within unoccuped space.")
+              
+        if len(data) != self.array.shape[0]:
+                
+            raise ValueError(f"Data must have {self.array.shape[0]} rows, but got {len(data)}")
+        
+        self.array[:, index] = data
+        
+    def normalized(self):
+        
+        normalizedarray = self.array
+        
+        for col in range(self.start):
+            col_sum = np.sum(normalizedarray[:, col])
+            if col_sum > 0:  # Avoid division by zero
+                normalizedarray[:, col] /= col_sum
+                
+                return normalizedarray
 
     def query(self, index):
         
