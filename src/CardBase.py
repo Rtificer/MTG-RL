@@ -1,6 +1,6 @@
 class Card:
     #W=White, U=Blue, B=Black, R=Red, G=Green, C=Colorless
-    def __init__(self, card_id, cost = {}, types={}, colors={}, power = None, toughness = None, abilities={}):
+    def __init__(self, card_id, cost = {}, types={}, colors={}, power = None, toughness = None, abilities={}, staticabilities = {}):
         self.card_id = card_id
         self.cost = cost #See above. Use W2 for two white mana. Use U1 for one white mana. Use R/G3
         self.types = types  #types: Sorcery, Instant, Enchantment, Artifact, Creature, PlanesWalker, Land, BasicLand
@@ -8,6 +8,7 @@ class Card:
         self.power = power
         self.toughness = toughness
         self.abilities = abilities  # List of ability functions or triggers
+        self.staticabilities = staticabilities
 
   
         

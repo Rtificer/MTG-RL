@@ -6,8 +6,8 @@ from Functions import draw_cards
 from Functions import register_decks
 from Functions import register_cards
 from Functions import DefineSettings
-from utils.utils import WriteIndexArray
-from utils.utils import TwoDimenionalWriteIndexArray
+from utils.utilities import StartIndexArray
+from utils.utilities import TwoDimensionalStartIndexArray
 
 
 register_cards()
@@ -36,19 +36,19 @@ class Player:
         
         self.Deck = None
         self.Life = np.uint8(20)
-        self.ManaPool = WriteIndexArray(6) #White, Blue, Black, Red, Green, Colorless
-        self.Hand = WriteIndexArray(gameSettings["MaxHandSize"])
-        self.Library = WriteIndexArray(gameSettings["MaxLibrarySize"])
-        self.Graveyard = WriteIndexArray(gameSettings["MaxGraveyardSize"])
-        self.ExileZone = WriteIndexArray(gameSettings["MaxExileZoneSize"])
+        self.ManaPool = StartIndexArray(6) #White, Blue, Black, Red, Green, Colorless
+        self.Hand = StartIndexArray(gameSettings["MaxHandSize"])
+        self.Library = StartIndexArray(gameSettings["MaxLibrarySize"])
+        self.Graveyard = StartIndexArray(gameSettings["MaxGraveyardSize"])
+        self.ExileZone = StartIndexArray(gameSettings["MaxExileZoneSize"])
         #Card ID
-        #Tapped
+        #Tappedy
         #Summoning Sickness
         #Counters
         #Remaining Toughness
         #Current Attack
         #Attachments
-        self.Battlefield = TwoDimenionalWriteIndexArray(6 + gameSettings["MaxAttachments"], gameSettings["MaxBattlefieldSize"])
+        self.Battlefield = TwoDimensionalStartIndexArray(6 + gameSettings["MaxAttachments"], gameSettings["MaxBattlefieldSize"])
         
 class PlayerPerspective:
     
@@ -64,7 +64,9 @@ class PlayerPerspective:
                 totalcardcount = deck_data[player.Deck]["TotalCardCount"]                
                 
                 self.Data[playerID] = {
-                    "Library" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxLibrarySize"])
+                    "DefaultProbabilityVector" : np.zeros(totalcardcount, dtype = np.uint16),
+                    "AdditonalVectors" : []
+                    
                 }
                 
             else:
@@ -73,10 +75,9 @@ class PlayerPerspective:
                 
                 self.Data[player.ID] = {
                     
-                    "Hand" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxHandSize"]),
-                    "Library" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxLibrarySize"]),    
-                    "Graveyard" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxGraveyardSize"]),              
-                    "ExileZone" : TwoDimenionalWriteIndexArray(totalcardcount, gameSettings["MaxExileZoneSize"])
+                    "DefaultProbabilityVector" : np.zeros(totalcardcount, dtype = np.uint16),
+                    "AdditonalVectors" : []
+                    
                 }            
         
 def SetupGameState():
@@ -194,6 +195,7 @@ def GameRuntime(game_state, StartingPlayer):
                 #If the card is a creature that isn't tapped and does not have summoning sickness
                 if "Creature" in CardInstance.types:
                     #TODO: Mark That Card As Attacking
+                    return
                     
         game_state.GamePhase = 7
         #Declare Defenders Subphase (2c)

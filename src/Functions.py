@@ -4,8 +4,8 @@ import os
 import importlib
 from CardBase import Card, register_card
 from AbilityBase import register_ability
-from utils.utils import obtainpositiveinteger
 from DeckBase import Deck
+import utils.utilities as ut
 
 def register_decks():
     # Add Decks directory to sys.path
@@ -87,13 +87,13 @@ def register_cards():
                 
 def DefineSettings():
     #Get Sizes for library, attachments, max battlefield card count, exile zones, graveyards, etc.
-    MaxHandSize = obtainpositiveinteger("Input maximum hand size: ")
-    MaxLibrarySize = obtainpositiveinteger("Input maximum library size: ")
-    MaxGraveyardSize = obtainpositiveinteger("Input maximum graveyard size: ")
-    MaxExileZoneSize = obtainpositiveinteger("Input maximum exile zone size: ")
-    MaxBattlefieldSize = obtainpositiveinteger("Input maximum battlefield size: ")
-    MaxAttachments = obtainpositiveinteger("Input Maximum attachments: ")
-    PlayerCount = obtainpositiveinteger("Input number of players: ")
+    MaxHandSize = ut.obtainpositiveinteger("Input maximum hand size: ")
+    MaxLibrarySize = ut.obtainpositiveinteger("Input maximum library size: ")
+    MaxGraveyardSize = ut.obtainpositiveinteger("Input maximum graveyard size: ")
+    MaxExileZoneSize = ut.obtainpositiveinteger("Input maximum exile zone size: ")
+    MaxBattlefieldSize = ut.obtainpositiveinteger("Input maximum battlefield size: ")
+    MaxAttachments = ut.obtainpositiveinteger("Input Maximum attachments: ")
+    PlayerCount = ut.obtainpositiveinteger("Input number of players: ")
             
     gameSettings = {
         "MaxHandSize":MaxHandSize, 
@@ -107,69 +107,15 @@ def DefineSettings():
     
     return gameSettings    
 
-def PutCardOntoBattlefield(player, card):
-    try:
-        #player.Battlefield[0, :] == 0 is a boolean array of the first row (card IDs) of the battlefield. True when a card slot does not contain a card
-        #argmax my beloved will scan through this array and output the index of the first occurence of true, in this case
-        Index = np.argmax(player.Battlefield[0, :] == 0)
-    except:
-        raise OverflowError(f"No space in {player}'s Battlefield")
-        
-    # If all card slots are full, np.argmax returns 0, which could be incorrect.
-    if player.Battlefield[0, Index] != 0:
-        raise OverflowError(f"No space in {player}'s Battlefield")
-    
-    player.Battlefield[:, Index] = card
+def PutCardOntoBattlefield(battlefield, card):
+    battlefield.add(card)
 
-def RemoveCardFromBattlefield(player, TargetCardID, Index):
-    if TargetCardID != None:
-        # Find the column index of the TargetCardID
-        Index = np.argmax(player.Battlefield[0, :] == TargetCardID)
-        
-        # Check if the card exists in the battlefield
-        if player.Battlefield[0, Index] != TargetCardID:
-            raise ValueError(f"Card ID {TargetCardID} not found in battlefield.")
-        
-    elif Index != None:
-        #Check if the index is valid
-        if Index > player.Battlefield.shape[1] or Index < 0:
-            raise ValueError(f"Target index {Index} is not within the battlefield bounds.")
-    else:
-    
-        raise ValueError("No Index or CardID given.")
+def RemoveCardFromBattlefield(battlefield, Index):
+    battlefield.remove(Index)
 
 
-    # Shift all columns left from the target index
-    player.Battlefield[:, Index:-1] = player.Battlefield[:, Index+1:]
-    
-    # Reset the last column to zero
-    player.Battlefield[:, -1] = 0
+            
         
-
-def draw_cards(player, num_cards):
-    # Check if the player has enough cards in the library
-    if np.count_nonzero(player.Library) < num_cards:
-        print(player.Name + " lost the game")
-        return  # Exit the function
-    
-    # Draw the specified number of cards
-    for _ in range(num_cards):
-        # Get the top card ID
-        DrawnCardID = player.Library[0]
-        
-        # Shift the library and fill the last position with 0
-        player.Library[:-1] = player.Library[1:]
-        player.Library[-1] = 0
-        
-        # Check if there's space in the hand
-        if not np.any(player.Hand == 0):
-            raise OverflowError(f"No space in {player.Name}'s Hand")
-        
-        # Find the first empty spot in the hand
-        HandIndex = np.argmax(player.Hand == 0)
-        
-        # Place the drawn card into the hand
-        player.Hand[HandIndex] = DrawnCardID
 
 def AddCardToExileZone(player, CardID):
     try:
