@@ -2,4 +2,8 @@
  
 A implementation of MTG in python, and a RL model to play it
 
-WIP
+NOT COMPLETE
+
+NOW DEAD - IN FAVOR OF MTG-RL++, a rewrite in c++
+
+
